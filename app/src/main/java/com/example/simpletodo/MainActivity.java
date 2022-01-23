@@ -5,7 +5,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
-import android.os.FileUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -18,6 +17,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.io.FileUtils;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -37,12 +37,7 @@ public class MainActivity extends AppCompatActivity {
         etItem = findViewById(R.id.etItem);
         rvItems = findViewById(R.id.rvItems);
 
-        etItem.clearFocus();
-
-        items = new ArrayList<>();
-        items.add("Buy milk");
-        items.add("Go to the gym");
-        items.add("Have fun!");
+        loadItems();
 
         ItemsAdapter.OnLongClickListener onLongClickListener = new ItemsAdapter.OnLongClickListener(){
             @Override
@@ -52,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
                 //Notify the adapter
                 itemsAdapter.notifyItemRemoved(position);
                 Toast.makeText(getApplicationContext(), "Item was removed", Toast.LENGTH_SHORT).show();
+                saveItems();
             }
         };
         itemsAdapter = new ItemsAdapter(items, onLongClickListener);
@@ -68,6 +64,7 @@ public class MainActivity extends AppCompatActivity {
                 itemsAdapter.notifyItemInserted( items.size()-1);
                 etItem.setText("");
                 Toast.makeText(getApplicationContext(), "Item was added", Toast.LENGTH_SHORT).show();
+                saveItems();
             }
         });
     }
@@ -87,4 +84,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     //This function saves items by writing them into the data file
+    private void saveItems(){
+        try {
+            FileUtils.writeLines(getDataFile(), items);
+        } catch (IOException e) {
+            Log.e("MainActivity", "Error reading items", e);
+        }
+    }
 }
